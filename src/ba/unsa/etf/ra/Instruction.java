@@ -94,4 +94,8 @@ public class Instruction {
     public void setTaken(boolean taken) {
         this.taken = taken;
     }
+
+    public boolean isStore() {
+        return naziv.equals("SW") || naziv.equals("SB") || naziv.equals("SWC1");
+    }
 }

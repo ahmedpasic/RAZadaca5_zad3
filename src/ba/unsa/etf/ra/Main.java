@@ -124,8 +124,8 @@ public class Main {
         if(prethodnaInstr.getNaziv().equals("BEQ") || prethodnaInstr.getNaziv().equals("BNE"))
             return null;//ako je instrukcija iznad instrukcija grananja onda ona nmz biti zadrska
 
-        if( prethodnaInstr.getOdredisni().equals(instrGrananja.getIzvorni1())
-            || prethodnaInstr.getOdredisni().equals(instrGrananja.getOdredisni())) return null; //grananje koristi registar u koji instrukcija iznad vrsi upis
+        if( !prethodnaInstr.isStore() && (prethodnaInstr.getOdredisni().equals(instrGrananja.getIzvorni1())
+            || prethodnaInstr.getOdredisni().equals(instrGrananja.getOdredisni()))) return null; //grananje koristi registar u koji instrukcija iznad vrsi upis
 
         if(prethodnaInstr.isTaken()) return null;
         prethodnaInstr.setTaken(true);
@@ -145,8 +145,8 @@ public class Main {
         Instruction instrSaOdredista = sekvenca.get(indeksOdredista);
 
         //ako je odredisna prije instrukcije grananja i ako ona mijenja jedan od izvornih registara instrukcije grananja
-        if(indeksOdredista < redniBrojInstr && (instrSaOdredista.getOdredisni().equals(instrGrananja.getOdredisni()) ||
-                instrSaOdredista.getOdredisni().equals(instrGrananja.getIzvorni1())))
+        if(!instrSaOdredista.isStore() && (indeksOdredista < redniBrojInstr && (instrSaOdredista.getOdredisni().equals(instrGrananja.getOdredisni()) ||
+                instrSaOdredista.getOdredisni().equals(instrGrananja.getIzvorni1()))))
             return null;
 
         if(instrSaOdredista.getNaziv().equals("BEQ") || instrSaOdredista.getNaziv().equals("BNE"))//kad se na odredistu nalazi neka dr. instr grananja
