@@ -54,6 +54,83 @@ public class Main {
 
 
 
+
+
         return new Instruction(label, naziv, odredisni, izvorni1, izvorni2, imm);
     }
+
+
+
+    //R TIP
+    public static ArrayList<String> rTip = new ArrayList<>() {
+        {
+            add("add");
+            add("addu");
+            add("and");
+            add("break");
+            add("div");
+            add("divu");
+            add("jalr");
+            add("jr");
+            add("mfhi");
+            add("mfl");
+            add("mthi");
+            add("mtlo");
+            add("mult");
+            add("multu");
+            add("nor");
+            add("or");
+            add("sll");
+            add("sllv");
+            add("slt");
+            add("sltu");
+            add("sra");
+            add("srav");
+            add("srl");
+            add("srlv");
+            add("sub");
+            add("subu");
+            add("syscall");
+            add("xor");
+        }
+    };
+
+    //I TIP
+    public static ArrayList<String> iTip = new ArrayList<>() {
+        {
+            add("addi");
+            add("addiu");
+            add("andi");
+            add("beq");
+            add("bgez");
+            add("bgtz");
+            add("blez");
+            add("bltz");
+            add("bne");
+            add("lb");
+            add("lbu");
+            add("lh");
+            add("lhu");
+            add("lui");
+            add("lw");
+            add("lwc1");
+            add("ori");
+            add("sb");
+            add("slti");
+            add("sltiu");
+            add("sh");
+            add("sw");
+            add("swc1");
+            add("xori");
+        }
+    };
+
+    //J TIP
+    public static ArrayList<String> jTip = new ArrayList<>() {
+        {
+            add("j");
+            add("jal");
+
+        }
+    };
 }
