@@ -1,7 +1,6 @@
 package ba.unsa.etf.ra;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,46 +56,52 @@ public class Main {
         }
     }
     private static Map<Instruction, Instruction> dajInstrukcijeZadrske(ArrayList<Instruction> sekvenca) {
-        Map<Instruction, Instruction> parovi = new HashMap<Instruction, Instruction>();
-        Instruction zadrska=null;
+        Map<Instruction, Instruction> parovi = new HashMap<>();
+        Instruction zadrska;
+        int i = 0;
         for(Instruction in : sekvenca){
             if(in.getNaziv().equals("BEQ") || in.getNaziv().equals("BNE")){
-                zadrska = dajInstrNakonInstrGrananjaZadrska(in, sekvenca);
-                if (zadrska!=null) parovi.put(in,zadrska);
-                if(zadrska==null){ //slucaj B
-                    //zadrska = funkcijaKojaDajeInstrZaSlucajB
-                    if(zadrska!=null) parovi.put(in,zadrska);
+                zadrska = dajInstrIznadInstrGrananjaZadrska(i, sekvenca);
+                if (zadrska != null) parovi.put(in,zadrska);
+                if(zadrska == null){ //slucaj B
+                    zadrska = dajInstrSaOdredistaGrananja(i, sekvenca);
+                    if(zadrska != null) parovi.put(in,zadrska);
                 }
-                if(zadrska==null){
-                    //zadrska= funkcijaKojaDajeInstrZaSlucajA
-                    if(zadrska!=null) parovi.put(in,zadrska);
+                if(zadrska == null){
+                    zadrska = dajInstrNakonInstrGrananjaZadrska(in, sekvenca);
+                    if(zadrska != null) parovi.put(in,zadrska);
                 }
-                if(zadrska==null){
+                if(zadrska == null){
                     //Ako je nakon 3 ispitana slucaja nije moguce naci zadrsku onda napisati u datoteku da za tu instrukciju
                     //nije moguce naci zadrsku, trebalo bi znaci par instrucija, i instrukcija zadrske u kojoj pise da nije moguce naci zadrsku
                 }
             }
+            i++;
         }
         return parovi;
     }
+
+    ////////////
+    //SLUCAJ C//
+    ////////////
     private static Instruction dajInstrNakonInstrGrananjaZadrska(Instruction instrukcija, ArrayList<Instruction> sekvenca){
         Instruction instr = null;
-        for(int i=0;i<sekvenca.size();i++){
+        for(int i=0 ; i<sekvenca.size() ; i++){
             if(sekvenca.get(i).getCijelaInstrukcija().equals(instrukcija.getCijelaInstrukcija())){
-                if(i+1==sekvenca.size()) return null; //ako je zadnja instrukcija, onda nema instrukcije iza nje
+                if(i+1 == sekvenca.size()) return null; //ako je zadnja instrukcija, onda nema instrukcije iza nje
                 //ako je iza beq ili bne onda one ne bismo trebali koristiti kao instrukcije zadrske
                 if(sekvenca.get(i+1).getNaziv().equals("BEQ") || sekvenca.get(i+1).getNaziv().equals("BNE")) return null;
                 instr = sekvenca.get(i+1);
-                int j=0;
-                while(j<sekvenca.size()){
-                    if(sekvenca.get(j).getLabel()==null){
+                int j = 0;
+                while(j < sekvenca.size()){
+                    if(sekvenca.get(j).getLabel() == null){
                         j++;// && sekvenca.get(j).getLabel()!=null || !sekvenca.get(j).getLabel().equals(instrukcija.getIzvorni2()) )) j++;
                     }
                     else if(sekvenca.get(j).getLabel().equals(instrukcija.getIzvorni2())) break;
                     else j++;
                 }
-                if(j==sekvenca.size()) return null; //dosli smo do kraja, a nema labele
-                while(j<sekvenca.size() && sekvenca.get(j).getCijelaInstrukcija()!=instrukcija.getCijelaInstrukcija()){
+                if(j == sekvenca.size()) return null; //dosli smo do kraja, a nema labele
+                while(j < sekvenca.size() && !sekvenca.get(j).getCijelaInstrukcija().equals(instrukcija.getCijelaInstrukcija()) ){
                     if( (sekvenca.get(j).getIzvorni1()!=null && sekvenca.get(j).getIzvorni1().equals(instr.getOdredisni())) || (
                             sekvenca.get(j).getIzvorni2()!=null && sekvenca.get(j).getIzvorni2().equals(instr.getOdredisni()) )) return null;
                     j++;
@@ -107,6 +112,53 @@ public class Main {
         return instr;
     }
 
+    ////////////
+    //SLUCAJ A//
+    ////////////
+    private static Instruction dajInstrIznadInstrGrananjaZadrska(int redniBrojInstr, ArrayList<Instruction> sekvenca) {
+        Instruction instrGrananja = sekvenca.get(redniBrojInstr);
+        if(redniBrojInstr == 0) return null;//instrukcija grananja prva instrukcija
+        Instruction prethodnaInstr = sekvenca.get(redniBrojInstr - 1);
+        if(prethodnaInstr.getNaziv().equals("BEQ") || prethodnaInstr.getNaziv().equals("BNE"))
+            return null;//ako je instrukcija iznad instrukcija grananja onda ona nmz biti zadrska
+
+        if( prethodnaInstr.getOdredisni().equals(instrGrananja.getIzvorni1())
+            || prethodnaInstr.getOdredisni().equals(instrGrananja.getOdredisni())) return null; //grananje koristi registar u koji instrukcija iznad vrsi upis
+
+        return prethodnaInstr;
+    }
+
+    ////////////
+    //SLUCAJ B//
+    ////////////
+    private static Instruction dajInstrSaOdredistaGrananja(int redniBrojInstr, ArrayList<Instruction> sekvenca) {
+
+        Instruction instrGrananja = sekvenca.get(redniBrojInstr);
+
+        int indeksOdredista = nadjiInstrukcijuSaLabelom(sekvenca, instrGrananja.getIzvorni2());
+        if(indeksOdredista == -1) return null;//nema labele uopce
+
+        Instruction instrSaOdredista = sekvenca.get(indeksOdredista);
+
+        //ako je odredisna prije instrukcije grananja i ako ona mijenja jedan od izvornih registara instrukcije grananja
+        if(indeksOdredista < redniBrojInstr && (instrSaOdredista.getOdredisni().equals(instrGrananja.getOdredisni()) ||
+                instrSaOdredista.getOdredisni().equals(instrGrananja.getIzvorni1())))
+            return null;
+
+        if(instrSaOdredista.getNaziv().equals("BEQ") || instrSaOdredista.getNaziv().equals("BNE"))//kad se na odredistu nalazi neka dr. instr grananja
+            return null;
+
+        return instrSaOdredista;
+    }
+
+    private static int nadjiInstrukcijuSaLabelom(ArrayList<Instruction> sekvenca, String labela) {
+        for(int i = 0 ; i < sekvenca.size() ; i++) {
+            if(sekvenca.get(i).getLabel() != null && sekvenca.get(i).getLabel().equals(labela))
+                return i;
+        }
+        return -1;//znak da nema te labele
+    }
+
     private static ArrayList<Instruction> dajSekvencuIzDatoteke(String put) throws IOException {
 
         ArrayList<Instruction> sekvenca = new ArrayList<>();
@@ -115,7 +167,7 @@ public class Main {
 
             br = new BufferedReader(new FileReader(put));
             String red = br.readLine();
-            while(red!=null) {
+            while(red != null) {
                 sekvenca.add(dajInstrukcijuIzStringa(red));
                 red = br.readLine();
             }
