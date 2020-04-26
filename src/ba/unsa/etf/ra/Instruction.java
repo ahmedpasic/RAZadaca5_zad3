@@ -3,6 +3,11 @@ package ba.unsa.etf.ra;
 public class Instruction {
 
     private String label, naziv, odredisni, izvorni1, izvorni2, imm, tip;
+    private boolean taken;
+
+    {
+        taken = false;
+    }
 
     public String getCijelaInstrukcija() {
         return cijelaInstrukcija;
@@ -82,4 +87,11 @@ public class Instruction {
     }
 
 
+    public boolean isTaken() {
+        return taken;
+    }
+
+    public void setTaken(boolean taken) {
+        this.taken = taken;
+    }
 }
