@@ -109,6 +109,8 @@ public class Main {
                 if(j==sekvenca.size()) i=sekvenca.size();
             }
         }
+        if(instr.isTaken()) return null;
+        instr.setTaken(true);
         return instr;
     }
 
@@ -125,6 +127,8 @@ public class Main {
         if( prethodnaInstr.getOdredisni().equals(instrGrananja.getIzvorni1())
             || prethodnaInstr.getOdredisni().equals(instrGrananja.getOdredisni())) return null; //grananje koristi registar u koji instrukcija iznad vrsi upis
 
+        if(prethodnaInstr.isTaken()) return null;
+        prethodnaInstr.setTaken(true);
         return prethodnaInstr;
     }
 
@@ -148,6 +152,9 @@ public class Main {
         if(instrSaOdredista.getNaziv().equals("BEQ") || instrSaOdredista.getNaziv().equals("BNE"))//kad se na odredistu nalazi neka dr. instr grananja
             return null;
 
+
+        if(instrSaOdredista.isTaken()) return null;
+        instrSaOdredista.setTaken(true);
         return instrSaOdredista;
     }
 
