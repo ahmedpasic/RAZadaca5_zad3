@@ -1,14 +1,10 @@
 package ba.unsa.etf.ra;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class Main {
 
@@ -20,6 +16,39 @@ public class Main {
         String put = ulaz.nextLine();
 
         ArrayList<Instruction> sekvenca = dajSekvencuIzDatoteke(put);
+
+        Map<Instruction, Instruction> parovi = dajInstrukcijeZadrske(sekvenca);
+
+        zapisiInstrukcijeZadrske(parovi);
+
+        System.out.println("Odredišna datoteka je: instrukcijeZadrske.txt");
+    }
+
+    private static void zapisiInstrukcijeZadrske(Map<Instruction,Instruction> parovi) {
+
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("instrukcijeZadrske.txt"));
+            for(Map.Entry<Instruction, Instruction> par : parovi.entrySet()) {
+                Instruction inst = par.getKey();
+                bw.write(inst.getCijelaInstrukcija());
+
+                if(par.getValue() == null) {
+                    bw.write("-----> nema instrukciju zadrske");
+                }
+                else
+                    bw.write("----->" + par.getValue().getCijelaInstrukcija());
+
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Map<Instruction, Instruction> dajInstrukcijeZadrske(ArrayList<Instruction> sekvenca) {
+        //ovo treba implementirati
+        return null;
     }
 
     private static ArrayList<Instruction> dajSekvencuIzDatoteke(String put) {
@@ -124,7 +153,7 @@ public class Main {
 
 
 
-        return new Instruction(label, naziv, odredisni, izvorni1, izvorni2, imm,tip);
+        return new Instruction(label, naziv, odredisni, izvorni1, izvorni2, imm, tip, red);
     }
 
     public static String dajRegistarLwSw(String nizSlova){

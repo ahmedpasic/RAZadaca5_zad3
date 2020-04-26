@@ -4,7 +4,17 @@ public class Instruction {
 
     private String label, naziv, odredisni, izvorni1, izvorni2, imm, tip;
 
-    public Instruction(String label, String naziv, String odredisni, String izvorni1, String izvorni2, String imm, String tip) {
+    public String getCijelaInstrukcija() {
+        return cijelaInstrukcija;
+    }
+
+    public void setCijelaInstrukcija(String cijelaInstrukcija) {
+        this.cijelaInstrukcija = cijelaInstrukcija;
+    }
+
+    private String cijelaInstrukcija;
+
+    public Instruction(String label, String naziv, String odredisni, String izvorni1, String izvorni2, String imm, String tip, String cijelaInstrukcija) {
         this.label = label;
         this.naziv = naziv;
         this.odredisni = odredisni;
@@ -12,6 +22,7 @@ public class Instruction {
         this.izvorni2 = izvorni2;
         this.imm = imm;
         this.tip = tip;
+        this.cijelaInstrukcija = cijelaInstrukcija;
     }
 
     public String getLabel() {
@@ -69,4 +80,6 @@ public class Instruction {
     public void setTip(String tip) {
         this.tip = tip;
     }
+
+
 }
