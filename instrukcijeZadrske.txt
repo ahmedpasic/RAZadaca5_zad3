@@ -1,0 +1,1 @@
+BEQ R1, R2, LABEL4----->SUB R5, R5, R3
