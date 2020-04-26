@@ -6,7 +6,9 @@ import java.io.FileReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -28,7 +30,10 @@ public class Main {
 
             BufferedReader br = new BufferedReader(new FileReader(put));
             String red = br.readLine();
-            sekvenca.add(dajInstrukcijuIzStringa(red));
+            while(red!=null) {
+                sekvenca.add(dajInstrukcijuIzStringa(red));
+                red = br.readLine();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,47 +45,80 @@ public class Main {
         String label=null, naziv=null, odredisni=null, izvorni1=null, izvorni2=null, imm=null, tip=null;
         InstructionType instructionType;
 
-        ArrayList<String> dijelovi = (ArrayList<String>) Arrays.asList(red.split(" "));
+        List<String> dijelovi = Arrays.asList(red.split(" "));
 
         if(dijelovi.get(0).contains(":")){
             label = dijelovi.get(0).substring(0,dijelovi.get(0).length()-1);
             naziv = dijelovi.get(1).trim().toUpperCase();//sve u velika tako da je podrzano citanje instrukcija i sa malim i sa velikim slovima
+            if(rTip.contains(naziv)){  //ako je R tip u pitanju
+                odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
+                izvorni2 = dijelovi.get(4).trim().toUpperCase();
+                imm=null;
+                tip = "R";
+            }
+            else if(iTip.contains(naziv)){ // ako je I tip u pitanju
+                if(naziv.toUpperCase().equals("LW") || naziv.toUpperCase().equals("SW")){
+                    odredisni=null;
+                    izvorni1=dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                    izvorni2= dajRegistarLwSw(dijelovi.get(3).toUpperCase());
+                }
+                else{
+                    odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                    izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
+                    izvorni2=null;
+                    imm = dijelovi.get(4).trim().toUpperCase();
+                }
+                tip="I";
+            }
+            else if(jTip.contains(naziv)){ // ako je J tip u pitanju
+                odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                izvorni1=null;
+                izvorni2=null;
+                imm=null;
+                tip = "J";
+            }
+            else{ // AKO NEMA INSTRUKCIJE NAPISATI U DATOTEKU DA NE VALJA SEKVENCA I PREKINUTI SA RADOM
+
+            }
         }
         else {//ako prvi dio nema dvotacku onda nemamo labelu i prvi dio je onda ustvari naziv instrukcije
             label = null;
             naziv = dijelovi.get(0).toUpperCase();
-        }
-        if(rTip.contains(naziv)){  //ako je R tip u pitanju
-            odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
-            izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
-            izvorni2 = dijelovi.get(4).trim().toUpperCase();
-            imm=null;
-            tip = "R";
-        }
-        else if(iTip.contains(naziv)){ // ako je I tip u pitanju
-            if(naziv.toUpperCase().equals("LW") || naziv.toUpperCase().equals("SW")){
-                odredisni=null;
-                izvorni1=dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
-                izvorni2= dajRegistarLwSw(dijelovi.get(3));
+            if(rTip.contains(naziv)){  //ako je R tip u pitanju
+                odredisni = dijelovi.get(1).trim().toUpperCase().substring(0,dijelovi.get(1).length()-1);
+                izvorni1 = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                izvorni2 = dijelovi.get(3).trim().toUpperCase();
+                imm=null;
+                tip = "R";
             }
-            else{
-                odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
-                izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
+            else if(iTip.contains(naziv)){ // ako je I tip u pitanju
+                if(naziv.toUpperCase().equals("LW") || naziv.toUpperCase().equals("SW")){
+                    odredisni=null;
+                    izvorni1=dijelovi.get(1).trim().toUpperCase().substring(0,dijelovi.get(1).length()-1);
+                    izvorni2= dajRegistarLwSw(dijelovi.get(2).toUpperCase());
+                }
+                else{
+                    odredisni = dijelovi.get(1).trim().toUpperCase().substring(0,dijelovi.get(1).length()-1);
+                    izvorni1 = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                    izvorni2=null;
+                    imm = dijelovi.get(3).trim().toUpperCase();
+                }
+                tip="I";
+            }
+            else if(jTip.contains(naziv)){ // ako je J tip u pitanju
+                odredisni = dijelovi.get(1).trim().toUpperCase().substring(0,dijelovi.get(1).length()-1);
+                izvorni1=null;
                 izvorni2=null;
-                imm = dijelovi.get(4).trim().toUpperCase();
+                imm=null;
+                tip = "J";
             }
-            tip="I";
-        }
-        else if(jTip.contains(naziv)){ // ako je J tip u pitanju
-            odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
-            izvorni1=null;
-            izvorni2=null;
-            imm=null;
-            tip = "J";
-        }
-        else{ // AKO NEMA INSTRUKCIJE NAPISATI U DATOTEKU DA NE VALJA SEKVENCA I PREKINUTI SA RADOM
+            else{ // AKO NEMA INSTRUKCIJE NAPISATI U DATOTEKU DA NE VALJA SEKVENCA I PREKINUTI SA RADOM
 
+            }
         }
+
+
 
 
 
@@ -104,7 +142,7 @@ public class Main {
     }
 
     //R TIP
-    public static ArrayList<String> rTip = new ArrayList<>() {
+    public static ArrayList<String> rTip1 = new ArrayList<>() {
         {
             add("add");
             add("addu");
@@ -136,9 +174,9 @@ public class Main {
             add("xor");
         }
     };
-
+    public static ArrayList<String> rTip = rTip1.stream().map(e -> e.toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
     //I TIP
-    public static ArrayList<String> iTip = new ArrayList<>() {
+    public static ArrayList<String> iTip1 = new ArrayList<>() {
         {
             add("addi");
             add("addiu");
@@ -166,13 +204,14 @@ public class Main {
             add("xori");
         }
     };
-
+    public static ArrayList<String> iTip = iTip1.stream().map(e -> e.toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
     //J TIP
-    public static ArrayList<String> jTip = new ArrayList<>() {
+    public static ArrayList<String> jTip1 = new ArrayList<>() {
         {
             add("j");
             add("jal");
 
         }
     };
+    public static ArrayList<String> jTip = jTip1.stream().map(e -> e.toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
 }
