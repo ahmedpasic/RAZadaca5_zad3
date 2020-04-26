@@ -2,10 +2,9 @@ package ba.unsa.etf.ra;
 
 public class Instruction {
 
-    private String label, naziv, odredisni, izvorni1, izvorni2, imm;
-    private InstructionType tip;
+    private String label, naziv, odredisni, izvorni1, izvorni2, imm, tip;
 
-    public Instruction(String label, String naziv, String odredisni, String izvorni1, String izvorni2, String imm, InstructionType tip) {
+    public Instruction(String label, String naziv, String odredisni, String izvorni1, String izvorni2, String imm, String tip) {
         this.label = label;
         this.naziv = naziv;
         this.odredisni = odredisni;
@@ -63,11 +62,11 @@ public class Instruction {
         this.imm = imm;
     }
 
-    public InstructionType getTip() {
+    public String getTip() {
         return tip;
     }
 
-    public void setTip(InstructionType tip) {
+    public void setTip(String tip) {
         this.tip = tip;
     }
 }

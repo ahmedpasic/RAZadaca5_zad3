@@ -33,33 +33,75 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return sekvenca;
     }
 
     private static Instruction dajInstrukcijuIzStringa(String red) {
-        String label, naziv, odredisni, izvorni1, izvorni2, imm;
+        String label=null, naziv=null, odredisni=null, izvorni1=null, izvorni2=null, imm=null, tip=null;
         InstructionType instructionType;
 
         ArrayList<String> dijelovi = (ArrayList<String>) Arrays.asList(red.split(" "));
 
         if(dijelovi.get(0).contains(":")){
-            label = dijelovi.get(0);
+            label = dijelovi.get(0).substring(0,dijelovi.get(0).length()-1);
             naziv = dijelovi.get(1).trim().toUpperCase();//sve u velika tako da je podrzano citanje instrukcija i sa malim i sa velikim slovima
         }
         else {//ako prvi dio nema dvotacku onda nemamo labelu i prvi dio je onda ustvari naziv instrukcije
             label = null;
-            naziv = dijelovi.get(0);
+            naziv = dijelovi.get(0).toUpperCase();
+        }
+        if(rTip.contains(naziv)){  //ako je R tip u pitanju
+            odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+            izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
+            izvorni2 = dijelovi.get(4).trim().toUpperCase();
+            imm=null;
+            tip = "R";
+        }
+        else if(iTip.contains(naziv)){ // ako je I tip u pitanju
+            if(naziv.toUpperCase().equals("LW") || naziv.toUpperCase().equals("SW")){
+                odredisni=null;
+                izvorni1=dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                izvorni2= dajRegistarLwSw(dijelovi.get(3));
+            }
+            else{
+                odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+                izvorni1 = dijelovi.get(3).trim().toUpperCase().substring(0,dijelovi.get(3).length()-1);
+                izvorni2=null;
+                imm = dijelovi.get(4).trim().toUpperCase();
+            }
+            tip="I";
+        }
+        else if(jTip.contains(naziv)){ // ako je J tip u pitanju
+            odredisni = dijelovi.get(2).trim().toUpperCase().substring(0,dijelovi.get(2).length()-1);
+            izvorni1=null;
+            izvorni2=null;
+            imm=null;
+            tip = "J";
+        }
+        else{ // AKO NEMA INSTRUKCIJE NAPISATI U DATOTEKU DA NE VALJA SEKVENCA I PREKINUTI SA RADOM
+
         }
 
 
 
 
 
-
-
-        return new Instruction(label, naziv, odredisni, izvorni1, izvorni2, imm);
+        return new Instruction(label, naziv, odredisni, izvorni1, izvorni2, imm,tip);
     }
 
-
+    public static String dajRegistarLwSw(String nizSlova){
+        String registar="";
+        for(int i=0;i<nizSlova.length();i++){
+            if(nizSlova.charAt(i)=='('){
+                i++;
+              while(nizSlova.charAt(i)!=')'){
+                  registar+=nizSlova.charAt(i);
+                  i++;
+              }
+            }
+        }
+        return registar.toUpperCase();
+    }
 
     //R TIP
     public static ArrayList<String> rTip = new ArrayList<>() {
